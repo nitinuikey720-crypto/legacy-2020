@@ -216,44 +216,68 @@ Memories that will stay forever.</p>
         </div>
     </section>
 
-    <section id="batch-list" class="py-32 bg-stone-50 relative overflow-hidden">
-        <div class="container mx-auto px-6 relative z-10 text-center">
-            <span class="text-amber-700 font-black uppercase tracking-[0.6em] text-[10px] mb-4 block">Together Forever</span>
-            <h2 class="text-5xl md:text-7xl font-serif text-amber-950 italic mb-20">The Golden Souls</h2>
-            <div class="flex flex-wrap justify-center gap-6 max-w-6xl mx-auto">
-                <script>
-                    const batchNames = [
-                        "Nitin Uikey", "Sameer Meshram", "Ankita Rahangdale", "Achal Thakre", 
-                        "Asha Rahangdale", "Shubham Mordeve", "Monesh Banewar", "Nikita Bhagat", 
-                        "Rashmit Raulkar", "Ratndeep Raulkar", "Komal Thakre", "Kartik Rahangdale", 
-                        "Krishana Rahangdale", "Ruchika Raulkar", "Yugal Raut", "Kajal Bisen", 
-                        "Shubham Thakre", "Ulash Khobragade"
-                    ];
+     <section id="batch-list" class="py-32 bg-stone-50 relative overflow-hidden">
+    <div class="container mx-auto px-6 relative z-10 text-center">
+        <span class="text-amber-700 font-black uppercase tracking-[0.6em] text-[10px] mb-4 block">Together Forever</span>
+        <h2 class="text-5xl md:text-7xl font-serif text-amber-950 italic mb-20">The Golden Souls</h2>
+        
+        <div class="flex flex-wrap justify-center gap-8 max-w-6xl mx-auto">
+            <script>
+                const batchData = [
+                    { name: "Nitin Uikey", role: "CSE IIIT-BH", img: "https://i.postimg.cc/bwnVVsvt/PHOTO-1-(8).jpg" },
+                    { name: "Sameer Meshram", role: "Mechanical Engineer", img: "https://i.postimg.cc/FFSk2Gqz/Whats_App_Image_2026_04_14_at_17_45_19.jpg" },
+                    { name: "Ankita Rahangdale", role: "Golden Batch", img: "तुमची_लिंक_२" },
+                    { name: "Achal Thakre", role: "Golden Batch", img: "तुमची_लिंक_३" },
+                    { name: "Asha Rahangdale", role: "Golden Batch", img: "तुमची_लिंक_४" },
+                    { name: "Shubham Mordeve", role: "Golden Batch", img: "https://i.postimg.cc/jdQyfB6H/Whats-App-Image-2026-04-14-at-11-11-22-(1).jpg" },
+                    { name: "Monesh Banewar", role: "Golden Batch", img: "https://i.postimg.cc/gJdMV3Xw/monesh.jpg" },
+                    { name: "Nikita Bhagat", role: "Golden Batch", img: "तुमची_लिंक_७" },
+                    { name: "Rashmit Raulkar", role: "Golden Batch", img: "https://i.postimg.cc/0jZ2kGmM/Whats-App-Image-2026-04-14-at-11-11-24.jpg" },
+                    { name: "Ratndeep Raulkar", role: "Golden Batch", img: "https://i.postimg.cc/MKdvqwbC/Whats-App-Image-2026-04-14-at-11-11-23.jpg" },
+                    { name: "Komal Thakre", role: "Golden Batch", img: "तुमची_लिंक_१०" },
+                    { name: "Kartik Rahangdale", role: "Golden Batch", img: "https://i.postimg.cc/1XSf55d1/Whats-App-Image-2026-04-14-at-11-11-23-(2).jpg" },
+                    { name: "Krishana Rahangdale", role: "Golden Batch", img: "https://i.postimg.cc/QdHN1dpN/IMG-5252-JPG.jpg" },
+                    { name: "Ruchika Raulkar", role: "Golden Batch", img: "https://i.postimg.cc/658MLjPC/Ruchika.jpg" },
+                    { name: "Yugal Raut", role: "Golden Batch", img: "https://i.postimg.cc/1RDFxbdX/Whats-App-Image-2026-04-14-at-11-11-23-(1).jpg" },
+                    { name: "Kajal Bisen", role: "Golden Batch", img: "तुमची_लिंक_१५" },
+                    { name: "Shubham Thakre", role: "Golden Batch", img: "तुमची_लिंक_१६" },
+                    { name: "Ulash Khobragade", role: "Golden Batch", img: "तुमची_लिंक_१७" }
+                ];
 
-                    function openNitinPopup() {
-                        const modal = document.getElementById('nitin-modal');
-                        modal.classList.remove('hidden');
-                        modal.classList.add('flex');
-                    }
+                function openMemberPopup(name, role, img) {
+                    const modal = document.getElementById('nitin-modal');
+                    const modalImg = modal.querySelector('img');
+                    const modalTitle = modal.querySelector('h3');
+                    const modalRole = modal.querySelector('p');
 
-                    batchNames.forEach(name => {
-                        const isNitin = name === "Nitin Uikey";
-                        const rotations = ['rotate-1', '-rotate-2', 'rotate-3', '-rotate-1', 'rotate-0'];
-                        const randomRot = rotations[Math.floor(Math.random() * rotations.length)];
-                        document.write(`
-                            <div onclick="${isNitin ? 'openNitinPopup()' : ''}" class="group relative ${randomRot} transition-all duration-500 hover:scale-110 cursor-pointer">
-                                <div class="absolute inset-0 bg-amber-200 rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-opacity"></div>
-                                <div class="relative px-8 py-4 bg-white border border-stone-200 rounded-2xl shadow-sm group-hover:shadow-xl group-hover:border-amber-400 transition-all flex items-center gap-3">
-                                    <span class="w-2 h-2 bg-amber-500 rounded-full ${isNitin ? 'animate-ping' : 'opacity-40'}"></span>
-                                    <span class="text-lg font-bold text-slate-700 group-hover:text-amber-950 tracking-tight font-serif uppercase">${name}</span>
-                                </div>
+                    modalImg.src = img || "https://via.placeholder.com/500x700?text=Wait+For+Photo";
+                    modalTitle.innerText = name;
+                    modalRole.innerText = role;
+
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                }
+
+                batchData.forEach(person => {
+                    const isNitin = person.name === "Nitin Uikey";
+                    const rotations = ['rotate-1', '-rotate-2', 'rotate-3', '-rotate-1', 'rotate-0'];
+                    const randomRot = rotations[Math.floor(Math.random() * rotations.length)];
+                    
+                    document.write(`
+                        <div onclick="openMemberPopup('${person.name}', '${person.role}', '${person.img}')" 
+                             class="group relative ${randomRot} transition-all duration-500 hover:scale-110 cursor-pointer">
+                            <div class="absolute inset-0 bg-amber-200 rounded-2xl blur-lg opacity-0 group-hover:opacity-40 transition-opacity"></div>
+                            <div class="relative px-8 py-4 bg-white border border-stone-200 rounded-2xl shadow-sm group-hover:shadow-xl group-hover:border-amber-400 transition-all flex items-center gap-3">
+                                <span class="w-2 h-2 bg-amber-500 rounded-full ${isNitin ? 'animate-ping' : 'opacity-40'}"></span>
+                                <span class="text-lg font-bold text-slate-700 group-hover:text-amber-950 tracking-tight font-serif uppercase">${person.name}</span>
                             </div>
-                        `);
-                    });
-                </script>
-            </div>
+                        </div>
+                    `);
+                });
+            </script>
         </div>
-    </section>
+    </div>
+</section>
 
     <div id="nitin-modal" class="fixed inset-0 bg-black/90 backdrop-blur-md z-[2000] hidden items-center justify-center p-4" onclick="this.classList.add('hidden')">
         <div class="relative max-w-sm w-full bg-white p-2 rounded-[2rem] shadow-2xl transform transition-all">
