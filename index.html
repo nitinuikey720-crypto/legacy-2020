@@ -1,6 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
 <head>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>The Legend | Kamlesh Meshram Sir</title>
@@ -28,8 +28,82 @@
         .diary-open { transform: rotateY(-155deg) translateX(40px); }
         .show-text { opacity: 1 !important; transform: translateX(0) !important; }
     </style>
+
+    <!-- 1. Supabase Library (Head ya Body ke end mein) -->
+<script src=sb_publishable_anAO7BdcGs4qt2hiVfWWnw_zj6w17Ls></script>
+
+<script>
+    // 1. Supabase Configuration
+    const SUPABASE_URL = 'https://rxefphbwiqdiuulcenjo.supabase.co';
+    const SUPABASE_KEY = 'sb_publishable_anAO7BdcGs4qt2hiVfWWnw_zj6w17Ls';
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    const track = document.getElementById('photo-track');
+    const input = document.getElementById('legacy-input');
+
+    // 2. Load Photos from Database on Page Load
+    async function loadMemories() {
+        const { data, error } = await supabase
+            .from('memories')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (data) {
+            track.innerHTML = ''; // Clear placeholders
+            data.forEach(mem => addCardToUI(mem.image_url, mem.caption));
+            // Double the content for smooth infinite scroll
+            track.innerHTML += track.innerHTML;
+        }
+    }
+
+    // 3. UI Function to add card
+    function addCardToUI(url, caption) {
+        const card = document.createElement('div');
+        card.className = 'memory-card';
+        const r = (Math.random() * 8 - 4).toFixed(2);
+        card.style.transform = `rotate(${r}deg)`;
+        card.innerHTML = `<img src="${url}"><p>${caption}</p>`;
+        track.prepend(card);
+    }
+
+    // 4. Handle Upload
+    input.addEventListener('change', async function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // a. Upload Image to Storage
+        const fileName = `${Date.now()}_${file.name}`;
+        const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('photos')
+            .upload(fileName, file);
+
+        if (uploadError) return alert("Upload failed!");
+
+        // b. Get Public URL
+        const { data: urlData } = supabase.storage
+            .from('photos')
+            .getPublicUrl(fileName);
+
+        const publicUrl = urlData.publicUrl;
+        const caption = "Memory " + new Date().toLocaleDateString();
+
+        // c. Save to Database
+        const { error: dbError } = await supabase
+            .from('memories')
+            .insert([{ image_url: publicUrl, caption: caption }]);
+
+        if (!dbError) {
+            addCardToUI(publicUrl, caption);
+            alert("Success! Your memory is now part of the legacy.");
+        }
+    });
+
+    loadMemories();
+</script>
+
+
 </head>
-<body class="text-slate-900 overflow-x-hidden">
+<br class="text-slate-900 overflow-x-hidden">
 
   <nav class="fixed top-0 left-0 w-full z-[1000] transition-all duration-500" id="main-nav">
     <div class="container mx-auto px-6 py-4 flex justify-between items-center" id="nav-wrapper">
@@ -111,9 +185,9 @@
                 <br>
                 <span class="text-amber-700 uppercase font-black tracking-[0.4em] text-xs">A Tribute • Batch 2012-2020</span>
                 <h1 class="text-6xl md:text-8xl font-black text-amber-950 leading-[0.9] tracking-tighter">More than<br> a Master.</h1>
-                <p class="text-2xl text-slate-700 leading-relaxed font-light italic border-l-4 border-amber-600 pl-6 max-w-xl">
-                    What began as a simple connection in the classroom gradually turned into a beautiful journey filled with growth, laughter, and unforgettable memories. We didn’t just gain knowledge—we discovered confidence, values, and a true sense of belonging. Under your guidance, we grew not only as students, but as individuals… and somewhere along the way, we became a family. 💫 Many times, a teacher’s presence lasts only until school ends. But you are still with us even today—and that truly makes us feel blessed. You didn’t just teach us lessons from books, you showed us a way of living, a perspective to understand life better. With you, we learned that a teacher’s impact goes far beyond the classroom and stays for a lifetime. And in this journey, we found not just a teacher, but a mentor, a friend, and a cherished part of our family.
-                </p>
+                <p class="text-2xl text-slate-700 leading-relaxed font-light italic border-l-4 border-amber-600 pl-6 max-w-xl">What started as a simple classroom connection became a journey of growth, memories, and belonging. 💫
+You didn’t just teach us subjects—you taught us life, confidence, and values.
+More than a teacher, you became our mentor, friend, and family. ❤️</p>
                 <div class="flex flex-wrap gap-4 pt-4">
                     <a href="#journey" class="px-10 py-4 bg-amber-950 text-white rounded-full font-bold hover:scale-105 transition shadow-2xl text-lg">Our Memories</a>
                     <a href="#audio" class="px-10 py-4 bg-amber-950 text-white rounded-full font-bold hover:scale-105 transition shadow-2xl text-lg">Our Massage</a>
@@ -455,6 +529,225 @@ function ringBell(){
 }
 </script>
 
+<!-- START: MEMORY STREAM SECTION (Standalone) -->
+<div class="legacy-wrapper" style="background: #FDFCF0; padding: 60px 0;">
+    <!-- Upload Button -->
+    <div class="upload-container" style="text-align: center; margin-bottom: 40px;">
+        <input type="file" id="memory-upload-input" hidden accept="image/*">
+        <button id="memory-upload-btn" class="plus-btn" style="width: 70px; height: 70px; border-radius: 50%; border: 2px dashed #f59e0b; background: white; color: #b45309; font-size: 32px; cursor: pointer; transition: 0.3s; display: inline-flex; align-items: center; justify-content: center;">
+            +
+        </button>
+        <p style="font-size: 10px; letter-spacing: 2px; color: #888; margin-top: 10px;">ADD YOUR MEMORY</p>
+    </div>
+
+    <!-- Moving Stream Container -->
+    <div class="marquee-box" style="width: 100%; overflow: hidden; white-space: nowrap; position: relative; padding: 20px 0;">
+        <div class="photo-track" id="memory-photo-track" style="display: inline-flex; gap: 32px; animation: scroll-stream 45s linear infinite;">
+            <!-- Cards injected here -->
+        </div>
+    </div>
+</div>
+
+<style>
+    @keyframes scroll-stream {
+        0% { transform: translateX(0); }
+        100% { transform: translateX(-50%); }
+    }
+    .memory-card {
+        background: #fff9ef;
+        padding: 12px 12px 28px 12px;
+        flex-shrink: 0;
+        box-shadow: 0 15px 30px -12px rgba(0,0,0,0.2);
+        transition: all 0.3s ease;
+        border-radius: 20px;
+        border: 1px solid #fde68a;
+        width: 210px;
+        display: inline-block;
+        vertical-align: top;
+    }
+    .memory-card img {
+        width: 186px;
+        height: 240px;
+        object-fit: cover;
+        border-radius: 14px;
+    }
+    .memory-card p {
+        font-family: 'Kalam', cursive;
+        margin-top: 12px;
+        font-size: 0.9rem;
+        color: #5c4b2e;
+        text-align: center;
+        font-weight: 500;
+    }
+    .memory-card:hover {
+        transform: scale(1.05) rotate(0deg) !important;
+        z-index: 50;
+        box-shadow: 0 25px 35px -12px rgba(0,0,0,0.3);
+        background: #fffdf7;
+    }
+    .plus-btn {
+        transition: all 0.2s;
+    }
+    .plus-btn.loading {
+        opacity: 0.6;
+        cursor: wait;
+        transform: scale(0.95);
+    }
+</style>
+
+<script>
+    (function() {
+        // ========== 1. SUPABASE CONFIGURATION (REPLACE WITH YOUR OWN) ==========
+        const SUPABASE_URL = 'https://rxefphbwiqdiuulcenjo.supabase.co';   // <-- CHANGE THIS
+        const SUPABASE_KEY = 'sb_publishable_anAO7BdcGs4qt2hiVfWWnw_zj6w17Ls';                      // <-- CHANGE THIS
+
+        // Initialize Supabase client
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // DOM elements
+        const track = document.getElementById('memory-photo-track');
+        const fileInput = document.getElementById('memory-upload-input');
+        const uploadBtn = document.getElementById('memory-upload-btn');
+
+        // Helper: Create a memory card element
+        function createCard(imageUrl, caption, timestamp = Date.now()) {
+            const card = document.createElement('div');
+            card.className = 'memory-card';
+            // Random slight rotation for vintage polaroid feel
+            const randomRot = (Math.random() * 6 - 3).toFixed(2);
+            card.style.transform = `rotate(${randomRot}deg)`;
+            card.innerHTML = `
+                <img src="${imageUrl}" alt="memory" loading="lazy" 
+                     onerror="this.src='https://via.placeholder.com/200x260?text=Image+Missing'">
+                <p>${escapeHtml(caption) || '✨ Untold moment'}</p>
+            `;
+            return card;
+        }
+
+        // Simple XSS protection for captions
+        function escapeHtml(str) {
+            if (!str) return '';
+            return str.replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Load all memories from Supabase and render them
+        async function loadMemories() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('memories')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                track.innerHTML = ''; // clear loading text
+
+                if (!data || data.length === 0) {
+                    track.innerHTML = '<div class="memory-card"><img src="https://via.placeholder.com/200x260?text=Be+First" alt="placeholder"><p>Add your memory ✨</p></div>';
+                    return;
+                }
+
+                // Add each memory card
+                data.forEach(mem => {
+                    track.appendChild(createCard(mem.image_url, mem.caption));
+                });
+
+                // Duplicate content for seamless infinite scroll (only if enough cards)
+                if (data.length >= 3) {
+                    const cloneHtml = track.innerHTML;
+                    track.innerHTML += cloneHtml;
+                } else {
+                    // If less than 3, duplicate to make scrolling smooth
+                    const cloneHtml = track.innerHTML;
+                    track.innerHTML += cloneHtml;
+                }
+            } catch (err) {
+                console.error('Failed to load memories:', err);
+                track.innerHTML = '<div class="memory-card"><img src="https://via.placeholder.com/200x260?text=Error" alt="error"><p>Could not load memories.<br>Check console.</p></div>';
+            }
+        }
+
+        // Upload a new memory
+        async function uploadMemory(file) {
+            if (!file) return;
+
+            // Show loading state on button
+            uploadBtn.classList.add('loading');
+            uploadBtn.innerHTML = '⏳';
+            const originalText = uploadBtn.innerHTML;
+
+            // Show optimistic card (local preview)
+            const reader = new FileReader();
+            let previewCard = null;
+            reader.onload = (e) => {
+                previewCard = createCard(e.target.result, 'Uploading...');
+                track.prepend(previewCard);
+            };
+            reader.readAsDataURL(file);
+
+            try {
+                // 1. Upload image to Supabase Storage (bucket 'photos')
+                const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, '_')}`;
+                const { error: uploadError } = await supabaseClient.storage
+                    .from('photos')
+                    .upload(fileName, file);
+
+                if (uploadError) throw new Error(`Storage upload failed: ${uploadError.message}`);
+
+                // 2. Get public URL of uploaded image
+                const { data: publicUrlData } = supabaseClient.storage
+                    .from('photos')
+                    .getPublicUrl(fileName);
+                const publicUrl = publicUrlData.publicUrl;
+
+                // 3. Ask user for a caption (optional)
+                let caption = prompt('✍️ Write a small memory (max 50 chars):', 'Golden flashback');
+                if (caption && caption.length > 50) caption = caption.slice(0, 47) + '...';
+                if (!caption) caption = 'Untold moment';
+
+                // 4. Insert record into 'memories' table
+                const { error: insertError } = await supabaseClient
+                    .from('memories')
+                    .insert([{ image_url: publicUrl, caption: caption }]);
+
+                if (insertError) throw new Error(`Database insert failed: ${insertError.message}`);
+
+                // 5. Remove temporary preview card and reload full list
+                if (previewCard && previewCard.parentNode) previewCard.remove();
+                await loadMemories();
+                alert('✨ Memory added forever! Thank you for contributing.');
+
+            } catch (err) {
+                console.error('Upload error:', err);
+                alert(`Upload failed: ${err.message}\n\nMake sure:\n1. Supabase URL & Key are correct.\n2. Storage bucket "photos" is public.\n3. Table "memories" exists with columns: id, image_url, caption, created_at.`);
+                // Remove the optimistic card if still there
+                if (previewCard && previewCard.parentNode) previewCard.remove();
+            } finally {
+                uploadBtn.classList.remove('loading');
+                uploadBtn.innerHTML = '+';
+                fileInput.value = ''; // allow re-upload of same file
+            }
+        }
+
+        // Event listeners
+        uploadBtn.addEventListener('click', () => {
+            fileInput.click();
+        });
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) uploadMemory(file);
+        });
+
+        // Initial load
+        loadMemories();
+    })();
+</script>
+<!-- END: MEMORY STREAM SECTION -->
 <style>
 @keyframes bellShake {
     0%, 100% { transform: rotate(0deg); }
